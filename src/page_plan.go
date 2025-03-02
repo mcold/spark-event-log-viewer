@@ -9,10 +9,14 @@ import (
 )
 
 type pagePlanType struct {
-	root    *tview.TreeNode
-	nNum    int
-	mIdDesc map[int]string
+	root      *tview.TreeNode
+	nNum      int
+	mIdDesc   map[int]string
+	mIdSimple map[int]string
 	*tview.TreeView
+	simpleArea *tview.TextArea
+	descArea   *tview.TextArea
+	flDesc     *tview.Flex
 	*tview.Flex
 }
 
@@ -21,9 +25,11 @@ var pagePlan pagePlanType
 func (pagePlan *pagePlanType) build() {
 
 	pagePlan.mIdDesc = make(map[int]string)
+	pagePlan.mIdSimple = make(map[int]string)
 
 	pagePlan.root = tview.NewTreeNode(".").
-		SetColor(tcell.ColorRed)
+		SetColor(tcell.ColorRed).
+		SetSelectable(false)
 
 	pagePlan.TreeView = tview.NewTreeView().SetRoot(pagePlan.root)
 	pagePlan.TreeView.SetCurrentNode(pagePlan.root)
@@ -36,17 +42,42 @@ func (pagePlan *pagePlanType) build() {
 
 	pagePlan.root.SetExpanded(true)
 
-	pagePlan.Flex = tview.NewFlex().
-		AddItem(pagePlan.TreeView, 0, 1, true)
+	pagePlan.simpleArea = tview.NewTextArea()
+
+	pagePlan.simpleArea.SetBorder(true).SetBorderColor(tcell.ColorBlue)
+	pagePlan.simpleArea.SetTitle("simple").
+		SetTitleAlign(tview.AlignLeft).
+		SetBorderPadding(1, 1, 1, 1)
+
+	pagePlan.descArea = tview.NewTextArea()
+
+	pagePlan.descArea.SetBorder(true).SetBorderColor(tcell.ColorBlue)
+	pagePlan.descArea.SetTitle("description").
+		SetTitleAlign(tview.AlignLeft).
+		SetBorderPadding(1, 1, 1, 1)
+
+	pagePlan.flDesc = tview.NewFlex().SetDirection(tview.FlexRow)
+	pagePlan.flDesc.SetBorder(true).SetBorderColor(tcell.ColorBlue)
+
+	pagePlan.flDesc.
+		AddItem(pagePlan.simpleArea, 0, 1, true).
+		AddItem(pagePlan.descArea, 0, 1, true)
+
+	pagePlan.Flex = tview.NewFlex().SetDirection(tview.FlexRow).
+		AddItem(pagePlan.TreeView, 0, 5, true).
+		AddItem(pagePlan.flDesc, 0, 3, true)
 
 	pagePlan.Flex.SetFocusFunc(func() {
-		log.Println("SetFocusFunc")
 		pagePlan.nNum = -1
 		setTreePlan()
 		app.SetFocus(pagePlan.TreeView)
 	})
-	// TODO
-	//pagePlan.TreeView.SetSelectedFunc()
+
+	pagePlan.TreeView.SetSelectedFunc(
+		func(node *tview.TreeNode) {
+			pagePlan.descArea.SetText(pagePlan.mIdDesc[node.GetReference().(int)], true)
+			pagePlan.simpleArea.SetText(pagePlan.mIdSimple[node.GetReference().(int)], true)
+		})
 
 	application.pages.AddPage("plan", pagePlan.Flex, true, false)
 }
@@ -57,6 +88,7 @@ func setTreePlan() {
 	arrNums := getNodeNum(ev)
 
 	pagePlan.nNum = 1
+	pagePlan.mIdSimple[arrNums[pagePlan.nNum]] = ev.SparkPlanInfo.SimpleString
 	node := tview.NewTreeNode(ev.SparkPlanInfo.NodeName + " (" + strconv.Itoa(arrNums[pagePlan.nNum]) + ")").
 		SetSelectable(true).
 		SetColor(tcell.ColorBlue).
@@ -70,6 +102,7 @@ func setTreePlanChildren(rootNode *tview.TreeNode, plan SparkPlan, arrNums map[i
 	var node *tview.TreeNode
 	for _, child := range plan.Children {
 		pagePlan.nNum++
+		pagePlan.mIdSimple[arrNums[pagePlan.nNum]] = child.SimpleString
 		node = tview.NewTreeNode(child.NodeName + " (" + strconv.Itoa(arrNums[pagePlan.nNum]) + ")").
 			SetSelectable(true).
 			SetColor(tcell.ColorBlue).
