@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strings"
 )
 
 type MetaData struct{}
@@ -33,43 +34,62 @@ type Event struct {
 	Time                    int64     `json:"time"`
 }
 
-func get_events() []Event {
+func getEvents() []Event {
 
 	arr := []Event{}
 
-	// Открываем файл
 	file, err := os.Open("log.log")
 	if err != nil {
-		log.Fatal("Ошибка при открытии файла:", err)
+		log.Fatal("Opening file error:", err)
 	}
 	defer file.Close()
 
-	// Создаем буферизированный считыватель
 	scanner := bufio.NewScanner(file)
 
 	const maxCapacity = 10 * 1024 * 1024 // 10 МБ
 	buf := make([]byte, maxCapacity)
 	scanner.Buffer(buf, maxCapacity)
 
-	// Читаем файл построчно
 	for scanner.Scan() {
-		// Получаем строку
-		line_json := scanner.Text()
+		lineJson := scanner.Text()
 
 		var event Event
 
-		// Десериализуем JSON в структуру
-		err := json.Unmarshal([]byte(line_json), &event)
+		err := json.Unmarshal([]byte(lineJson), &event)
 		if err != nil {
-			log.Fatal("Ошибка при десериализации JSON:", err)
+			log.Fatal("Deserialization error JSON:", err)
 		}
 
 		arr = append(arr, event)
 	}
 
-	// Проверяем на ошибки при чтении
 	if err := scanner.Err(); err != nil {
-		log.Fatal("Ошибка при чтении файла:", err)
+		log.Fatal("Reading file error:", err)
 	}
 	return arr
+}
+
+func getSources() {
+	for _, ev := range pageMain.Events {
+		for _, child := range ev.SparkPlanInfo.Children {
+			getSrc(child)
+		}
+	}
+	pageSrc.TextArea.SetText(strings.Join(pagePlan.sSrc, "\n"), true)
+}
+
+func getSrc(sp SparkPlan) {
+	if len(sp.Children) == 0 {
+		checkSrc(sp)
+	} else {
+		for _, child := range sp.Children {
+			getSrc(child)
+		}
+	}
+}
+
+func checkSrc(sp SparkPlan) {
+	if strings.HasPrefix(sp.NodeName, "Scan") {
+		pagePlan.sSrc = append(pagePlan.sSrc, sp.SimpleString)
+	}
 }

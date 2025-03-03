@@ -26,6 +26,7 @@ func (application *applicationType) init() {
 	application.pages = tview.NewPages()
 	pageMain.build()
 	pagePlan.build()
+	pageSrc.build()
 
 	pageConfirm.build()
 	application.registerGlobalShortcuts()
@@ -48,6 +49,10 @@ func (application *applicationType) registerGlobalShortcuts() {
 			setTreePlan()
 			application.pages.SwitchToPage("plan")
 			app.SetFocus(pagePlan.Flex)
+		case tcell.KeyF4:
+			getSources()
+			application.pages.SwitchToPage("src")
+			app.SetFocus(pageSrc.Flex)
 		default:
 			return event
 

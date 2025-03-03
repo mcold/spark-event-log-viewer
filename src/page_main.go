@@ -18,7 +18,7 @@ var pageMain pageMainType
 
 func (pageMain *pageMainType) build() {
 
-	pageMain.Events = get_events()
+	pageMain.Events = getEvents()
 
 	pageMain.List = tview.NewList()
 	pageMain.List.SetTitle("events").

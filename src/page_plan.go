@@ -17,6 +17,7 @@ type pagePlanType struct {
 	simpleArea *tview.TextArea
 	descArea   *tview.TextArea
 	flDesc     *tview.Flex
+	sSrc       []string
 	*tview.Flex
 }
 
