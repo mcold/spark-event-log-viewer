@@ -27,9 +27,12 @@ func (application *applicationType) init() {
 	pageMain.build()
 	pagePlan.build()
 	pageSrc.build()
-
+	pageHelp.build()
+	
 	pageConfirm.build()
+
 	application.registerGlobalShortcuts()
+
 	app.SetFocus(pageMain.Flex)
 
 	if err := app.SetRoot(application.pages, true).EnableMouse(true).EnablePaste(true).Run(); err != nil {
@@ -43,6 +46,8 @@ func (application *applicationType) registerGlobalShortcuts() {
 		switch event.Key() {
 		case tcell.KeyCtrlC:
 			application.ConfirmQuit()
+		case tcell.KeyF1:
+			application.pages.SwitchToPage("help")
 		case tcell.KeyF2:
 			application.pages.SwitchToPage("main")
 		case tcell.KeyF3:
