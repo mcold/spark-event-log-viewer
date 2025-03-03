@@ -38,7 +38,7 @@ func getEvents() []Event {
 
 	arr := []Event{}
 
-	file, err := os.Open("log.log")
+	file, err := os.Open(os.Args[1])
 	if err != nil {
 		log.Fatal("Opening file error:", err)
 	}

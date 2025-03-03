@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"os"
 )
 
 type pageMainType struct {
@@ -19,6 +21,10 @@ var pageMain pageMainType
 func (pageMain *pageMainType) build() {
 
 	pageMain.Events = getEvents()
+	if len(pageMain.Events) == 0 {
+		fmt.Println("No events in log-file")
+		os.Exit(1)
+	}
 
 	pageMain.List = tview.NewList()
 	pageMain.List.SetTitle("events").
