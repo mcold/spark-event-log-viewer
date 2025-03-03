@@ -45,8 +45,9 @@ func (application *applicationType) registerGlobalShortcuts() {
 		case tcell.KeyF2:
 			application.pages.SwitchToPage("main")
 		case tcell.KeyF3:
+			setTreePlan()
 			application.pages.SwitchToPage("plan")
-			app.SetFocus(pagePlan.TreeView)
+			app.SetFocus(pagePlan.Flex)
 		default:
 			return event
 

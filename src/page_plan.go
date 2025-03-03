@@ -84,6 +84,8 @@ func (pagePlan *pagePlanType) build() {
 
 func setTreePlan() {
 	log.Println("setTreePlan")
+	log.Println("clear tree")
+	pagePlan.root.ClearChildren()
 	ev := pageMain.Events[pageMain.List.GetCurrentItem()]
 	arrNums := getNodeNum(ev)
 
@@ -122,7 +124,6 @@ func getNodeNum(event Event) map[int]int {
 		if pagePlan.nNum == 0 {
 			continue
 		}
-		log.Println(str)
 		if strings.TrimSpace(str) == "" {
 			break
 		}

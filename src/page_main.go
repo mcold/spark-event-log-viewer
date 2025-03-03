@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"log"
 )
 
 type pageMainType struct {
@@ -48,9 +47,6 @@ func (pageMain *pageMainType) build() {
 		AddItem(pageMain.List, 0, 1, true).
 		AddItem(pageMain.flDetails, 0, 1, false)
 
-	log.Println(len(pageMain.Events))
-	log.Println(pageMain.Events[0].EventName)
-	log.Println(pageMain.Events[0].Details)
 	for _, ev := range pageMain.Events {
 		pageMain.List.AddItem(ev.EventName, "", rune(0), func() {
 			pageMain.Details.SetText(pageMain.Events[pageMain.List.GetCurrentItem()].Details)
